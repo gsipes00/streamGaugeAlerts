@@ -1,7 +1,7 @@
 """
 Configuration for the Stream Gauge Flood Alert Application.
 """
-
+KONEXUS_API_URL = "https://admin.alertsense.com/api/v2/alerts"
 
 # Use /data for persistent disk on Render
 ALERTS_FILE = "/data/active_flood_alerts.json"
