@@ -42,7 +42,7 @@ GAUGE_CONFIGS = {
     # },
     "50083007": {
         "stages": {
-            "stage1": 0.05,
+            "stage1": 4.0,
             "stage2": 3.0
         },
         "name": "Purgatory Creek at Guadalupe Street Water Level",
@@ -50,7 +50,7 @@ GAUGE_CONFIGS = {
     },
     "50084007": {
         "stages": {
-            "stage1": 0.05,
+            "stage1": 4.0,
             "stage2": 5.0
         },
         "name": "San Marcos River at Cape Road Water Level",
