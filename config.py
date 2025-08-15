@@ -50,7 +50,7 @@ GAUGE_CONFIGS = {
     },
     "50084007": {
         "stages": {
-            "stage1": 0.05,
+            "stage1": 2.0,
             "stage2": 5.0
         },
         "name": "San Marcos River at Cape Road Water Level",
