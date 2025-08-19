@@ -144,5 +144,14 @@ def send_konexus_alert(gauge_id, gauge_name, stage_height, alert_type, config):
         resp = requests.post(KONEXUS_API_URL, json=payload, headers=headers, timeout=10)
         logging.info(f"Sent {alert_type} for {gauge_name} (ID: {gauge_id}) | Status: {resp.status_code}")
         logging.info(f"Response: {resp.text}")
+        # Parse response for timestamp and status
+        result = None
+        try:
+            result = resp.json()
+        except Exception as e:
+            logging.error(f"Error parsing API response JSON: {e}")
+        # Return relevant info for main.py
+        return result
     except Exception as e:
         logging.error(f"Error sending alert for {gauge_id}: {e}")
+        return None
