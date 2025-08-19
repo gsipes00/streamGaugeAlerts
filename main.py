@@ -35,14 +35,36 @@ def process_gauges():
         config = GAUGE_CONFIGS.get(gauge_id)
         if not config:
             continue  # Only monitor configured gauges
-        last_stage = active_flood_alerts.get(gauge_id)
+        last_alert = active_flood_alerts.get(gauge_id)
+        last_stage = last_alert["stage"] if isinstance(last_alert, dict) and "stage" in last_alert else last_alert
         send_alert, alert_type = should_send_alert(gauge_id, stage_height, last_stage, config)
         if send_alert and alert_type:
-            send_konexus_alert(gauge_id, gauge_name, stage_height, alert_type, config)
+            api_response = send_konexus_alert(gauge_id, gauge_name, stage_height, alert_type, config)
+            # Parse timestamp from DateSent in API response
+            def parse_datesent(datesent):
+                import re, datetime
+                match = re.match(r"/Date\((\d+)-\d+\)/", datesent)
+                if match:
+                    ms = int(match.group(1))
+                    dt = datetime.datetime.utcfromtimestamp(ms / 1000)
+                    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                return None
+            timestamp = None
+            alert_sent = False
+            if api_response and "SentStatus" in api_response:
+                datesent = api_response["SentStatus"].get("DateSent")
+                timestamp = parse_datesent(datesent) if datesent else None
+            if api_response and "Status" in api_response:
+                alert_sent = api_response["Status"].get("isSuccess", False)
             if alert_type == "FLOOD ALL-CLEAR":
                 del active_flood_alerts[gauge_id]
             else:
-                active_flood_alerts[gauge_id] = alert_type.split()[1].lower()  # "stage1" or "stage2"
+                active_flood_alerts[gauge_id] = {
+                    "timestamp": timestamp if timestamp else time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "stage": alert_type.split()[1].lower(),
+                    "level": stage_height,
+                    "alertSent": alert_sent
+                }
             save_active_flood_alerts(active_flood_alerts)
 
 
